@@ -8,7 +8,7 @@ const CartProductCard = ({ item }) => {
   const { increaseQty, decreaseQty } = useContext(CartContext);
 
   return (
-    <View className="flex-row bg-white shadow-lg rounded-lg">
+    <View className="flex-row   rounded-lg">
       <Image
         className="rounded-l-lg object-fill"
         source={{
