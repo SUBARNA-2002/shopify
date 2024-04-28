@@ -214,7 +214,7 @@ const Cart = () => {
                 handleAddressSelect(item);
               }} // Update the selected address when this button is pressed
             >
-              <Text className="text-base px-2 text-white py-2">Select</Text>
+              <Text className="text-base px-2 text-white py-2">Choose</Text>
             </TouchableOpacity>
           </View>
         ))}
