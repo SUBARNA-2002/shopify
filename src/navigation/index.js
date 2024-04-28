@@ -5,6 +5,8 @@ import Home from "../screens/Home";
 import Cart from "../screens/Cart";
 import { MaterialIcons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
+// import SignIn from "../screens/SignIn";
+import SignIn from "../screens/SignIn";
 
 const Stack = createNativeStackNavigator();
 
@@ -12,11 +14,12 @@ const AppNavigation = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="home"
+        initialRouteName="login"
         screenOptions={{
           headerShown: false,
         }}
       >
+        <Stack.Screen name="login" component={SignIn} />
         <Stack.Screen name="home" component={Home} />
         <Stack.Screen
           name="cart"

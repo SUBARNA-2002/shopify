@@ -7,15 +7,44 @@ import {
   StyleSheet,
   Button,
 } from "react-native";
-import React, { useCallback, useContext, useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { CartContext } from "../context/CartContext";
 import CartProductCard from "../components/CartScreen/CartProductCard";
 import "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import RazorpayCheckout from "react-native-razorpay";
 
 const Cart = () => {
+  const address = [
+    {
+      id: 1,
+      name: "Home",
+      address: "Kailash Vihar,Bhubaneswar,Odisha,India,751024",
+    },
+    {
+      id: 2,
+      name: "Work",
+      address: "Cyber City,Gurugram,Haryana,India,122002",
+    },
+    {
+      id: 3,
+      name: "Other",
+      address: "Kailash Vihar,Bhubaneswar,Odisha,India,751024",
+    },
+  ];
+  const [selectedAddress, setSelectedAddress] = useState(null);
+
+  // console.log("address", address);
   const { cartItems } = useContext(CartContext);
   const totalValue = cartItems.reduce(
     (total, item) => total + item.price * item.qty,
@@ -44,11 +73,30 @@ const Cart = () => {
     bottomSheetRef.current?.close();
   }, []);
 
+  useEffect(() => {
+    const loadAddress = async () => {
+      const storedAddress = await AsyncStorage.getItem("selectedAddress");
+      if (storedAddress) {
+        setSelectedAddress(JSON.parse(storedAddress));
+      } else {
+        setSelectedAddress(address[0]); // Default address if none is stored
+      }
+    };
+
+    loadAddress();
+  }, []);
+
+  const handleAddressSelect = async (item) => {
+    handleClosePress();
+    setSelectedAddress(item);
+    await AsyncStorage.setItem("selectedAddress", JSON.stringify(item));
+  };
+
   return (
     <GestureHandlerRootView className="flex-1">
       <View className="flex-1 bg-violet-50 pt-3 px-3">
         <View className="flex-1">
-          {cartItems.length === 0 ? (
+          {cartItems?.length === 0 ? (
             <View className="flex-1 justify-center items-center">
               <Image
                 source={{
@@ -73,7 +121,9 @@ const Cart = () => {
           <View>
             <Text className="text-base">Address</Text>
             <Text className="text-base" numberOfLines={2}>
-              Kailash Vihar,Bhubaneswar,Odisha,India,751024
+              <Text className="text-base" numberOfLines={2}>
+                {selectedAddress?.address || "No address selected"}
+              </Text>
             </Text>
           </View>
 
@@ -103,7 +153,35 @@ const Cart = () => {
             <Text className="text-base">SubTotal</Text>
             <Text className="text-base">Rs. {SubTotal}</Text>
           </View>
-          <TouchableOpacity className="bg-[#9d32a8] inline-block  rounded-lg mt-3 mx-3">
+          <TouchableOpacity
+            className="bg-[#9d32a8] inline-block  rounded-lg mt-3 mx-3"
+            onPress={() => {
+              var options = {
+                description: "Credits towards consultation",
+                image: "https://i.imgur.com/3g7nmJC.jpg",
+                currency: "INR",
+                key: "rzp_test_FcAg5OyR96FxNd	",
+                amount: "5000",
+                name: "Acme Corp",
+                order_id: "", //Replace this with an order_id created using Orders API.
+                prefill: {
+                  email: "gaurav.kumar@example.com",
+                  contact: "9191919191",
+                  name: "Gaurav Kumar",
+                },
+                theme: { color: "#9d32a8" },
+              };
+              RazorpayCheckout.open(options)
+                .then((data) => {
+                  // handle success
+                  alert(`Success: ${data.razorpay_payment_id}`);
+                })
+                .catch((error) => {
+                  // handle failure
+                  alert(`Error: ${error.code} | ${error.description}`);
+                });
+            }}
+          >
             <Text className="text-base text-center  text-white py-3">
               Checkout
             </Text>
@@ -120,23 +198,29 @@ const Cart = () => {
         snapPoints={snapPoints}
         animateOnMount={true}
       >
-        {/* <TouchableOpacity
-          className="bg-[#9d32a8] inline-block  rounded-lg "
-          onPress={handleClosePress}
-        >
-          <Text className="text-base px-2 text-white py-2">Close</Text>
-        </TouchableOpacity> */}
+        {address?.map((item) => (
+          <View className=" rounded-md  flex-row justify-between p-2 items-center bg-red-100 border border-[#9d32a8] m-1  py-2">
+            <View>
+              <Text className="text-base">{item?.name}</Text>
+              <Text className="text-base" numberOfLines={2}>
+                {item?.address}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              className="bg-[#9d32a8] inline-block  rounded-lg "
+              onPress={() => {
+                handleClosePress();
+                handleAddressSelect(item);
+              }} // Update the selected address when this button is pressed
+            >
+              <Text className="text-base px-2 text-white py-2">Select</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
       </BottomSheet>
     </GestureHandlerRootView>
   );
 };
 
-// const styles = StyleSheet.create({
-//   contentContainer: {
-//     position: "absolute",
-//     bottom: 0,
-//     // flex: 1,
-//     // alignItems: "center",
-//   },
-// });
 export default Cart;

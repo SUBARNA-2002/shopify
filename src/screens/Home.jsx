@@ -24,14 +24,14 @@ const Home = () => {
     <View className="flex-1 bg-violet-50">
       <View className="flex-1">
         <UserInfo />
-        <TrendingProducts data={product.slice(0, 5)} />
+        <TrendingProducts data={product?.slice(0, 5)} />
         <TopTab
           data={tabs}
           selected={selectedTab}
           setSelected={setSelectedTab}
         />
         {selectedTab === "Popular" && renderFlatList(product)}
-        {selectedTab === "Offer" && renderFlatList(product.slice(5, 35))}
+        {selectedTab === "Offer" && renderFlatList(product?.slice(5, 35))}
       </View>
     </View>
   );

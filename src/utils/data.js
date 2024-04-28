@@ -277,4 +277,5 @@ const product = [
     category: "wall-art",
   },
 ];
+
 export default product;

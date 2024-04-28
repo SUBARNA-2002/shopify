@@ -34,9 +34,11 @@ const UserInfo = () => {
             </View>
           )}
         </TouchableOpacity>
-        <View className="bg-black/20 p-2 rounded-md">
-          <MaterialIcons name="logout" size={24} color="white" />
-        </View>
+        <TouchableOpacity onPress={()=>navigation.navigate("login")}>
+          <View className="bg-black/20 p-2 rounded-md">
+            <MaterialIcons name="logout" size={24} color="white" />
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
